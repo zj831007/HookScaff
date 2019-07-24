@@ -51,19 +51,34 @@ namespace YuanshengHook
             GetDecodeFileLen_Delegate FileLen_Delegate = (GetDecodeFileLen_Delegate)Marshal.GetDelegateForFunctionPointer(new IntPtr(0x7FF76FA5B8C0), typeof(GetDecodeFileLen_Delegate));
             DecodeBytes_Delegate decode_Delegate = (DecodeBytes_Delegate)Marshal.GetDelegateForFunctionPointer(new IntPtr(0x7FF76FA5C7B0), typeof(DecodeBytes_Delegate));
 
-            string filePath = "E:/BaiduNetdiskDownload/yuanshen/GS_Data/StreamingAssets/AssetBundles/00/000b6059.asb";
 
-            byte[] ab_bytes = File.ReadAllBytes(filePath);
+            string dir = "E:/BaiduNetdiskDownload/yuanshen/GS_Data/StreamingAssets/AssetBundles/";
+            string outDir = "E:/BaiduNetdiskDownload/yuanshen/GS_Data/StreamingAssets/ab_decode/";
 
-            long fileLen = FileLen_Delegate(ab_bytes.LongLength); //计算解密后的长度
+            DirectoryInfo di = new DirectoryInfo(dir);
+            DirectoryInfo[] dis = di.GetDirectories();
+            foreach (DirectoryInfo item in dis)
+            {
+                FileInfo[] fis = item.GetFiles($"*.asb");
+                foreach (FileInfo fi in fis)
+                {
+                    byte[] ab_bytes = File.ReadAllBytes(fi.FullName);
+
+                    long fileLen = FileLen_Delegate(ab_bytes.LongLength); //计算解密后的长度
 
 
-            byte[] decode_bytes = new byte[fileLen];
+                    byte[] decode_bytes = new byte[fileLen];
 
-            decode_Delegate(ab_bytes, ab_bytes.LongLength, decode_bytes, fileLen);
+                    decode_Delegate(ab_bytes, ab_bytes.LongLength, decode_bytes, fileLen);
 
-            File.WriteAllBytes("E:/BaiduNetdiskDownload/yuanshen/GS_Data/StreamingAssets/AssetBundles/t.ab", decode_bytes);
-            _serverInterface.ReportMessage( "encode Len:" + ab_bytes.LongLength + ", decode len:"+ fileLen + " ,out size:");
+                    string outFileName = outDir + fi.Name;
+                    File.WriteAllBytes(outFileName, decode_bytes);
+
+                    _serverInterface.ReportMessage("decode ab:" + fi.Name + ", decode len:" + fileLen);
+
+                }
+            }
+            
         }
 
         //此方法在目标进程执行
