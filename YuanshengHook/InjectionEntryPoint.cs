@@ -60,10 +60,10 @@ namespace YuanshengHook
 
             byte[] decode_bytes = new byte[fileLen];
 
-            decode_Delegate(ab_bytes, ab_bytes.LongLength, ref decode_bytes, fileLen, 0L, new IntPtr(0), -2L);
+            decode_Delegate(ab_bytes, ab_bytes.LongLength, decode_bytes, fileLen);
 
-
-            _serverInterface.ReportMessage( "encode Len:" + ab_bytes.LongLength + ", decode len:"+ fileLen);
+            File.WriteAllBytes("E:/BaiduNetdiskDownload/yuanshen/GS_Data/StreamingAssets/AssetBundles/t.ab", decode_bytes);
+            _serverInterface.ReportMessage( "encode Len:" + ab_bytes.LongLength + ", decode len:"+ fileLen + " ,out size:");
         }
 
         //此方法在目标进程执行
@@ -117,7 +117,7 @@ namespace YuanshengHook
         delegate long GetDecodeFileLen_Delegate( long encodeFileLen );
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall, SetLastError = true)]
-        delegate int DecodeBytes_Delegate(byte[] bytes, long encodeLen ,ref  byte[] output ,long decodeLen,long xxx,IntPtr n , long  flag);
+        delegate int DecodeBytes_Delegate(byte[] bytes, long encodeLen , byte[] outFile ,long decodeLen);
 
 
 
